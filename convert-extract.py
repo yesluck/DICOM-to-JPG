@@ -17,7 +17,7 @@ def convert_dcm_in_a_folder(folder_path, output_folder_path, png=True):
     # download this file from the given link # https://github.com/vivek8981/DICOM-to-JPG
     dicom_image_description = pd.read_csv("dicom_image_description.csv")
 
-    with open('Patient_Detail.csv', 'w', newline ='') as csvfile:
+    with open(os.path.join(output_folder_path, f'Patient_Detail_{output_folder_path.split("/")[-1]}.csv'), 'w', newline ='') as csvfile:
         fieldnames = list(dicom_image_description["Description"])
         writer = csv.writer(csvfile, delimiter=',')
         writer.writerow(fieldnames)
@@ -51,5 +51,18 @@ def convert_dcm_in_a_folder(folder_path, output_folder_path, png=True):
                 print(image)
 
 
+def process(input, output):
+    if not os.path.exists(output):
+        os.makedirs(output)
+
+    for folder_name in os.listdir(input):
+        input_path = os.path.join(input, folder_name)
+        output_path = os.path.join(output, folder_name)
+        if os.path.isdir(input_path):
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
+            convert_dcm_in_a_folder(input_path, output_path)
+
+
 if __name__ == "__main__":
-    convert_dcm_in_a_folder("input/1.2.826.0.2.139953.3.1.1.21.3790383532.20231126164942.3634260912", "PNG_test_0507")
+    process("input", "output")
